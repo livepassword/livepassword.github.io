@@ -9,8 +9,11 @@
     "publish": "node ./publish.js"
   },
   "dependencies": {
+    "copy-to-clipboard": "^3.2.0",
     "core-js": "^2.6.5",
     "gh-pages": "^2.0.1",
+    "js-sha256": "^0.9.0",
+    "mint-ui": "^2.2.13",
     "vue": "^2.6.10"
   },
   "devDependencies": {
@@ -18,8 +21,12 @@
     "@vue/cli-plugin-eslint": "^3.9.0",
     "@vue/cli-service": "^3.9.0",
     "babel-eslint": "^10.0.1",
+    "babel-plugin-component": "^1.1.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "less": "^3.9.0",
+    "less-loader": "^5.0.0",
+    "prettier": "^1.18.2",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
