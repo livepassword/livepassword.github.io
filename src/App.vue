@@ -1,8 +1,9 @@
 <template>
-  <div id="app">
-    <mt-field label="记忆密码" type="password" v-model="memoryKey"></mt-field>
-    <mt-field label="标识符" v-model="specialKey"></mt-field>
-    <mt-field label="密码位数" v-model="passwdNum"></mt-field>
+  <div id="app" :class="showPCStyle ? 'is-pc' : ''">
+    <h3>Live password</h3>
+    <mt-field label="记忆密码" placeholder="与个人信息无关的密码" type="password" v-model="memoryKey"></mt-field>
+    <mt-field label="区分代号" placeholder="taobao、weixin、weibo ..." v-model="specialKey"></mt-field>
+    <mt-field label="密码位数" placeholder="10~40" v-model="passwdNum"></mt-field>
     <mt-field label="包含大小写">
       <mt-switch v-model="isContainUpper"></mt-switch>
     </mt-field>
@@ -33,7 +34,8 @@ export default {
     specialKey: '',
     isContainUpper: false,
     isContainSpecial: false,
-    passwdNum: '16'
+    passwdNum: '16',
+    showPCStyle: false
   }),
   components: {
     [Field.name]: Field,
@@ -59,6 +61,10 @@ export default {
     }) {
       if (!memoryKey || !specialKey) return '';
       let shaResult = sha(sha(memoryKey) + sha(specialKey));
+      passwdNum = parseInt(passwdNum, 10)
+      if (passwdNum < 10) passwdNum = 10
+      if (passwdNum > 40) passwdNum = 40
+      if (!passwdNum || isNaN(passwdNum)) passwdNum = 16
       shaResult = shaResult.slice(START_NUM, +passwdNum + START_NUM);
       if (isContainUpper) {
         let i = 0;
@@ -81,12 +87,25 @@ export default {
       return shaResult;
     }
   },
-  mounted() {}
+  mounted() {
+    this.showPCStyle = window.innerWidth > 450
+  }
 };
 </script>
 
 <style lang="less">
 #app {
+  &.is-pc {
+    width: 450px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 1px 1px 2px #ccc;
+    padding-bottom: 30px;
+    margin: 30px auto;
+  }
+  h3 {
+    text-align: center;
+  }
   .mint-button {
     margin: 10px auto;
     display: block;
