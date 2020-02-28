@@ -1,38 +1,35 @@
 <template>
   <div id="app" :class="showPCStyle ? 'is-pc' : ''">
     <h3>Live password</h3>
-    <mt-field label="记忆密码" placeholder="与个人信息无关的密码" type="password" v-model="memoryKey" />
-    <mt-field label="区分代号" placeholder="taobao、weixin、weibo ..." v-model="specialKey" />
-    <mt-field label="密码位数" placeholder="10~40" v-model="passwdNum" />
-    <mt-field label="包含大小写">
-      <mt-switch v-model="isContainUpper" />
-    </mt-field>
-    <mt-field label="包含特殊字符">
-      <mt-switch v-model="isContainSpecial" />
-    </mt-field>
+    <mt-field
+      label="记忆密码"
+      placeholder="与个人信息无关的密码"
+      type="password"
+      v-model="memoryKey"
+    />
+    <mt-field
+      label="区分代号"
+      placeholder="taobao、weixin、weibo ..."
+      v-model="specialKey"
+    />
     <mt-cell title="密码">
       <span>{{ result }}</span>
     </mt-cell>
-    <mt-button @click="handleCopy" type="primary" :disabled="!result">点击复制密码</mt-button>
+    <mt-button @click="handleCopy" type="primary" :disabled="!result"
+      >点击复制密码</mt-button
+    >
   </div>
 </template>
 
 <script>
-import sha from 'js-sha256';
 import { Field, Switch, Button, Toast, Cell } from 'mint-ui';
 import copy from 'copy-to-clipboard';
-
-const START_NUM = 5;
-const SPECIAL_CODE = ',';
 
 export default {
   name: 'app',
   data: () => ({
     memoryKey: '',
     specialKey: '',
-    isContainUpper: false,
-    isContainSpecial: false,
-    passwdNum: '16',
     showPCStyle: false
   }),
   components: {
@@ -42,47 +39,33 @@ export default {
     [Button.name]: Button
   },
   methods: {
-    replaceString(str, pos, target) {
-      return str.substring(0, pos - 1) + target + str.substring(pos);
-    },
     handleCopy() {
       copy(this.result);
       Toast({ message: '复制成功' });
     }
   },
   computed: {
-    result({
-      memoryKey,
-      specialKey,
-      isContainUpper,
-      isContainSpecial,
-      passwdNum
-    }) {
+    result({ memoryKey, specialKey }) {
+      let shaResult = '';
       if (!memoryKey || !specialKey) return '';
-      let shaResult = sha(sha(memoryKey) + sha(specialKey));
-      passwdNum = parseInt(passwdNum, 10);
-      if (passwdNum < 10) passwdNum = 10;
-      if (passwdNum > 40) passwdNum = 40;
-      if (!passwdNum || isNaN(passwdNum)) passwdNum = 16;
-      shaResult = shaResult.slice(START_NUM, +passwdNum + START_NUM);
-      if (isContainUpper) {
-        let i = 0;
-        shaResult = shaResult
-          .split('')
-          .map(word => {
-            if (word > 'a' && word < 'z') {
-              i++;
-              if (i % 2) word = word.toUpperCase();
-            }
-            return word;
-          })
-          .join('');
-        if (i === 0) shaResult = shaResult.slice(2) + 'Az';
+      const str = 'abeklnosuvwxy01279';
+      const md5one = window.md5(memoryKey, specialKey);
+      const md5two = window.md5(md5one, 'snow');
+      const md5three = window.md5(md5one, 'kise');
+      const rule = md5three.split('');
+      const source = md5two.split('');
+      for (let i = 0; i < 32; i++) {
+        if (isNaN(source[i])) {
+          if (str.search(rule[i]) > -1) {
+            source[i] = source[i].toUpperCase();
+          }
+        }
       }
-      if (isContainSpecial) {
-        const middle = Math.floor(shaResult.length / 2);
-        shaResult = this.replaceString(shaResult, middle, SPECIAL_CODE);
-      }
+      const code32 = source.join('');
+      const code1 = code32.slice(0, 1);
+      shaResult = isNaN(code1)
+        ? code32.slice(0, 16)
+        : 'K' + code32.slice(1, 16);
       return shaResult;
     }
   },
