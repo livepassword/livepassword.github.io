@@ -5,12 +5,12 @@
       label="记忆密码"
       placeholder="与个人信息无关的密码"
       type="password"
-      v-model="memoryKey"
+      v-model.trim="memoryKey"
     />
     <mt-field
       label="区分代号"
       placeholder="taobao、weixin、weibo ..."
-      v-model="specialKey"
+      v-model.trim="specialKey"
     />
     <mt-cell title="密码">
       <span>{{ result }}</span>
