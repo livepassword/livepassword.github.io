@@ -12,6 +12,9 @@
       placeholder="taobao、weixin、weibo ..."
       v-model.trim="specialKey"
     />
+    <mt-cell title="缓存记忆密码">
+      <mt-switch v-model="cacheMemoryKey"></mt-switch>
+    </mt-cell>
     <mt-cell title="密码">
       <span>{{ result }}</span>
     </mt-cell>
@@ -30,6 +33,7 @@ export default {
   data: () => ({
     memoryKey: '',
     specialKey: '',
+    cacheMemoryKey: false,
     showPCStyle: false
   }),
   components: {
@@ -69,8 +73,28 @@ export default {
       return shaResult;
     }
   },
+  watch: {
+    cacheMemoryKey: {
+      handler(v) {
+        window.localStorage.setItem('cacheMemoryKey', String(v));
+        if (v) {
+          window.localStorage.setItem('memoryKey', this.memoryKey);
+        } else {
+          window.localStorage.clear();
+        }
+      }
+    },
+    memoryKey (v) {
+      if (this.cacheMemoryKey) {
+        window.localStorage.setItem('memoryKey', v);
+      }
+    }
+  },
   mounted() {
     this.showPCStyle = window.innerWidth > 450;
+    this.memoryKey = window.localStorage.getItem('memoryKey')
+    this.cacheMemoryKey =
+      window.localStorage.getItem('cacheMemoryKey') === 'true';
   }
 };
 </script>
