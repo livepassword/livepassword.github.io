@@ -78,7 +78,7 @@ export default {
       handler(v) {
         window.localStorage.setItem('cacheMemoryKey', String(v));
         if (v) {
-          window.localStorage.setItem('memoryKey', this.memoryKey);
+          window.localStorage.setItem('memoryKey', this.memoryKey || '');
         } else {
           window.localStorage.clear();
         }
@@ -86,7 +86,7 @@ export default {
     },
     memoryKey (v) {
       if (this.cacheMemoryKey) {
-        window.localStorage.setItem('memoryKey', v);
+        window.localStorage.setItem('memoryKey', v || '');
       }
     }
   },
